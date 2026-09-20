@@ -1108,10 +1108,7 @@
 <div class="wrap">
 
   <header class="top">
-    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-      <h1>CSA - Roster</h1>
-      <div id="currentPageTitle" style="font-family:var(--font-body);font-size:14px;font-weight:600;color:var(--primary);background:var(--primary-dim);padding:6px 14px;border-radius:20px;"></div>
-    </div>
+    <h1>CSA - Roster</h1>
     <div class="updated" id="updatedAt">Loading…</div>
   </header>
 
@@ -1667,20 +1664,11 @@
   const DETAILS_PAGE_SIZE = 30;
 
   /* ========== VIEW SWITCHER ========== */
-  const viewNames = {
-    'todayView': "Today's Schedule",
-    'detailsView': 'All Entries',
-    'agentView': 'Agent History',
-    'calendarView': 'Calendar',
-    'swapView': 'Swap Helper',
-    'otView': 'OT'
-  };
-  
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-
+      
       const targetId = btn.getAttribute('data-view');
       document.getElementById('todayView').style.display = targetId === 'todayView' ? 'block' : 'none';
       document.getElementById('detailsView').style.display = targetId === 'detailsView' ? 'block' : 'none';
@@ -1688,30 +1676,11 @@
       document.getElementById('calendarView').style.display = targetId === 'calendarView' ? 'block' : 'none';
       document.getElementById('swapView').style.display = targetId === 'swapView' ? 'block' : 'none';
       document.getElementById('otView').style.display = targetId === 'otView' ? 'block' : 'none';
-      
-      // Update current page title
-      const pageTitleEl = document.getElementById('currentPageTitle');
-      if (pageTitleEl) {
-        pageTitleEl.textContent = viewNames[targetId] || '';
-      }
-      
       if(targetId === 'calendarView') renderCalendar();
       if(targetId === 'swapView') renderSwap();
       if(targetId === 'otView') renderOTSummary();
     });
   });
-  
-  // Initialize page title on load
-  (function initPageTitle() {
-    const activeBtn = document.querySelector('.nav-btn.active');
-    if (activeBtn) {
-      const targetId = activeBtn.getAttribute('data-view');
-      const pageTitleEl = document.getElementById('currentPageTitle');
-      if (pageTitleEl && viewNames[targetId]) {
-        pageTitleEl.textContent = viewNames[targetId];
-      }
-    }
-  })();
 
   /* ========== TODAY VIEW RENDER ========== */
   const monthsEn = ['January','February','March','April','May','June','July','August','September','October','November','December'];
