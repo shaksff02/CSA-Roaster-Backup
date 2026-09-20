@@ -9,7 +9,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet">
   <style>
-    /* ===== Merged Styles ===== */
     :root{
       --paper:#f8f9fa;
       --surface:#ffffff;
@@ -73,13 +72,15 @@
       font-family:var(--font-body);
     }
 
-    /* ---- Tab Navigation ---- */
     .view-nav{
       display:flex;
       gap:10px;
       margin-bottom:24px;
       border-bottom:1px solid var(--line);
+      overflow-x:auto;
+      scrollbar-width:none;
     }
+    .view-nav::-webkit-scrollbar{ display:none; }
     .nav-btn{
       background:transparent;
       border:none;
@@ -91,6 +92,7 @@
       cursor:pointer;
       border-bottom:2px solid transparent;
       transition:color .15s ease, border-color .15s ease;
+      flex:0 0 auto;
     }
     .nav-btn:hover{ color:var(--ink); }
     .nav-btn.active{ 
@@ -98,7 +100,6 @@
       border-bottom-color:var(--emerald); 
     }
 
-    /* ---- Date Navigation ---- */
     .date-nav{
       display:flex;
       gap:10px;
@@ -159,7 +160,6 @@
     }
     .date-btn.active .m, .date-btn.active .d, .date-btn.active .w{ color:#fff; }
 
-    /* ---- Shared Components ---- */
     .filters{
       display:flex;
       flex-wrap:wrap;
@@ -220,7 +220,6 @@
     }
     .clear-btn:hover, .reset-btn:hover{ border-color:var(--ink); color:var(--ink); }
 
-    /* ---- Salary Summary Panel (collapsible) ---- */
     .salary-panel{
       border:1px solid var(--line);
       border-radius:var(--radius);
@@ -346,7 +345,6 @@
     .pill.other{ background:var(--info-dim); color:var(--info); }
     .pill.off{ background:var(--raised); color:var(--muted); }
 
-    /* ---- Today View (Professional Dashboard) ---- */
     .hero-date{
       font-family:var(--font-display);
       font-size:28px;
@@ -439,7 +437,6 @@
       font-weight:500;
     }
     
-    /* Agent Grid Layout */
     .agent-list{ 
       display:grid; 
       grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));
@@ -479,7 +476,6 @@
     }
     .agent-info .sysid{ color:var(--faint); font-size:12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* ---- Details & History Tables ---- */
     .summary{ font-size:13px; color:var(--muted); margin-bottom:14px; }
     .summary b{ color:var(--ink); font-weight:600; }
 
@@ -608,7 +604,6 @@
     }
     .state-msg.error{ color:var(--danger); border-color:var(--danger); }
 
-    /* ---- Agent Stats Cards ---- */
     .stats-grid{
       display:grid;
       grid-template-columns:repeat(4, 1fr);
@@ -641,7 +636,6 @@
       text-align:center;
     }
 
-    /* ---- Custom Holiday Picker (Salary Panel) ---- */
     .holiday-field{
       margin:0 0 20px;
     }
@@ -717,7 +711,6 @@
       margin-top:10px;
     }
 
-    /* ---- Custom Holiday Modal (multi-select calendar popup) ---- */
     .holiday-modal-overlay{
       position:fixed;
       inset:0;
@@ -853,14 +846,164 @@
     }
     .holiday-modal-ok:hover{ opacity:0.9; }
 
-    /* ===== MOBILE RESPONSIVE FIXES ===== */
+    /* ===== CALENDAR VIEW ===== */
+    .cal-header{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+    .cal-title{ font-family:var(--font-display); font-size:22px; font-weight:600; color:var(--ink); }
+    .cal-nav{ display:flex; gap:8px; }
+    .cal-nav button{
+      background:var(--surface); border:1px solid var(--line); color:var(--ink);
+      border-radius:8px; padding:8px 14px; font-size:13px; font-weight:500;
+      font-family:var(--font-body); cursor:pointer; transition:all .15s ease;
+    }
+    .cal-nav button:hover{ border-color:var(--emerald); color:var(--emerald); }
+    .cal-legend{ display:flex; gap:16px; flex-wrap:wrap; margin-bottom:14px; font-size:12px; color:var(--muted); }
+    .cal-legend span{ display:inline-flex; align-items:center; gap:6px; }
+    .cal-legend i{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+    .cal-legend i.eu{ background:var(--emerald); }
+    .cal-legend i.glo{ background:var(--gold); }
+    .cal-legend i.udp{ background:var(--plum); }
+    .cal-legend i.other{ background:var(--faint); }
+
+    .cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:8px; }
+    .cal-dow{ text-align:center; font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; padding:4px 0; }
+    .cal-cell{
+      background:var(--surface); border:1px solid var(--line); border-radius:10px;
+      min-height:112px; padding:8px; display:flex; flex-direction:column; gap:4px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.02);
+    }
+    .cal-cell[data-key]{ cursor:pointer; transition:border-color .15s ease; }
+    .cal-cell[data-key]:hover{ border-color:var(--emerald); }
+    .cal-cell.other-month{ opacity:0.4; background:transparent; border-style:dashed; box-shadow:none; }
+    .cal-cell.is-today{ border:2px solid var(--emerald); }
+    .cal-cell.is-sel{ border-color:var(--info); background:var(--info-dim); }
+    .cal-day-num{ font-size:12px; font-weight:600; color:var(--muted); }
+    .cal-cell.is-today .cal-day-num{ color:var(--emerald); }
+    .cal-agents{ display:flex; flex-direction:column; gap:3px; overflow:hidden; }
+    .cal-agent{ display:flex; align-items:center; gap:5px; min-width:0; }
+    .cal-agent i{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+    .cal-agent i.eu{ background:var(--emerald); }
+    .cal-agent i.glo{ background:var(--gold); }
+    .cal-agent i.udp{ background:var(--plum); }
+    .cal-agent i.other{ background:var(--faint); }
+    .cal-agent .nm{ font-size:11px; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .cal-more{ font-size:10.5px; color:var(--muted); font-weight:500; }
+    .cal-offn{ font-size:10px; color:var(--faint); }
+
+    /* ===== SWAP HELPER ===== */
+    .swap-me{
+      border:1px solid var(--line); border-radius:var(--radius); background:var(--surface);
+      padding:18px 20px; margin-bottom:8px; display:flex; align-items:center; gap:14px;
+      flex-wrap:wrap; box-shadow:0 4px 12px rgba(0,0,0,0.02);
+    }
+    .swap-me .who{ font-family:var(--font-display); font-size:18px; font-weight:600; color:var(--ink); }
+    .swap-me .meta{ font-size:13px; color:var(--muted); }
+    .swap-list-title{
+      font-family:var(--font-display); font-size:17px; font-weight:600; margin:20px 0 12px;
+      color:var(--ink); display:flex; align-items:center; gap:8px;
+    }
+    .swap-list-title span.badge{
+      font-family:var(--font-body); font-size:12px; background:var(--surface-alt);
+      color:var(--muted); padding:3px 10px; border-radius:20px; font-weight:500;
+    }
+    .swap-item{
+      background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+      padding:12px 16px; margin-bottom:8px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    }
+    .swap-item .info{ flex:1; min-width:160px; }
+    .swap-item .nm{ font-weight:600; font-size:14px; color:var(--ink); }
+    .swap-item .sid{ font-size:12px; color:var(--faint); }
+    .swap-item .why{ font-size:11.5px; font-weight:600; padding:4px 10px; border-radius:20px; }
+    .swap-item .why.off{ background:var(--emerald-dim); color:var(--emerald); }
+    .swap-item .why.diff{ background:var(--info-dim); color:var(--info); }
+
+    /* ===== OT ===== */
+    #salaryGrid{ grid-template-columns:repeat(5, 1fr); }
+    .ot-log-item{
+      display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
+      font-size:13px; color:var(--ink); padding:8px 0; border-bottom:1px dashed var(--line);
+    }
+    .ot-log-item:last-child{ border-bottom:none; }
+    .ot-log-item .ot-date{ font-weight:600; min-width:95px; }
+    .ot-log-item .ot-amt{ margin-left:auto; font-weight:600; color:var(--emerald); }
+    .ot-tag{
+      display:inline-block; margin-left:6px; padding:3px 9px; border-radius:20px;
+      font-size:10.5px; font-weight:700; background:var(--gold-dim); color:var(--gold);
+      border:1px dashed var(--gold); vertical-align:middle;
+    }
+
+    /* ===== OT PAGE (redesigned) ===== */
+    .ot-hero{
+      display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+      margin-bottom:28px;
+    }
+    .ot-hero-title{
+      font-family:var(--font-display); font-size:28px; font-weight:600; color:var(--ink);
+      letter-spacing:-0.5px;
+    }
+    .ot-hero-sub{ font-size:14px; color:var(--muted); margin-top:6px; }
+    .ot-add-btn{
+      background:var(--emerald); color:#fff; border:none; border-radius:10px;
+      padding:13px 24px; font-size:14px; font-weight:600; font-family:var(--font-body);
+      cursor:pointer; display:inline-flex; align-items:center; gap:8px;
+      box-shadow:0 4px 14px rgba(11,122,95,0.28); transition:all .15s ease;
+    }
+    .ot-add-btn:hover{ opacity:0.92; transform:translateY(-1px); }
+    .ot-add-btn:active{ transform:translateY(0); }
+
+    #otSummaryTable td:nth-child(3),
+    #otSummaryTable td:nth-child(4),
+    #otSummaryTable td:nth-child(5){ text-align:right; }
+    #otSummaryTable tfoot td{
+      font-weight:700; background:var(--surface-alt); border-top:2px solid var(--line);
+    }
+    #otSummaryTable .ot-agent-cell{
+      display:flex; align-items:center; gap:12px; min-width:0;
+    }
+    #otSummaryTable .ot-agent-cell .avatar{ width:32px; height:32px; font-size:12px; }
+
+    .ot-modal-overlay{
+      position:fixed; inset:0; background:rgba(33,37,41,0.55);
+      display:flex; align-items:center; justify-content:center; z-index:1100; padding:20px;
+    }
+    .ot-modal{
+      background:var(--surface); border-radius:var(--radius); width:100%; max-width:400px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.25); overflow:hidden;
+    }
+    .ot-modal-header{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:18px 22px; border-bottom:1px solid var(--line); background:var(--surface-alt);
+    }
+    .ot-modal-title{ font-family:var(--font-display); font-weight:600; font-size:17px; color:var(--ink); }
+    .ot-modal-close{ background:none; border:none; color:var(--faint); font-size:22px; line-height:1; cursor:pointer; padding:0; }
+    .ot-modal-close:hover{ color:var(--ink); }
+    .ot-modal-body{ padding:20px 22px 8px; display:flex; flex-direction:column; gap:14px; }
+    .ot-modal-body .field{ min-width:0; }
+    .ot-modal-msg{ padding:6px 22px 4px; font-size:13px; min-height:20px; }
+    .ot-modal-msg.ok{ color:var(--emerald); font-weight:600; }
+    .ot-modal-msg.err{ color:var(--danger); font-weight:600; }
+    .ot-modal-footer{
+      display:flex; gap:10px; justify-content:flex-end; padding:16px 22px 20px;
+    }
+    .ot-modal-cancel{
+      background:transparent; border:1px solid var(--line); color:var(--muted);
+      border-radius:8px; padding:10px 18px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:var(--font-body);
+      transition:all .15s ease;
+    }
+    .ot-modal-cancel:hover{ border-color:var(--ink); color:var(--ink); }
+    .ot-modal-save{
+      background:var(--emerald); border:1px solid var(--emerald); color:#fff;
+      border-radius:8px; padding:10px 22px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:var(--font-body);
+      transition:opacity .15s ease;
+    }
+    .ot-modal-save:hover{ opacity:0.9; }
+    .ot-modal-save:disabled{ opacity:0.5; cursor:not-allowed; }
+
     @media (max-width:640px){
       .wrap{ padding:24px 16px 48px; }
       header.top{ flex-direction:column; align-items:flex-start; gap:8px; }
       header.top h1{ font-size:24px; }
       header.top .updated{ font-size: 11px; }
       
-      /* Date strip stays a horizontally scrollable row on mobile too */
       .date-btn {
         min-width:54px;
         padding: 9px 12px;
@@ -868,8 +1011,8 @@
 
       .hero-date{ font-size:22px; margin-top: 10px; }
       .hero-sub{ margin-bottom: 24px; }
+      .ot-hero-title{ font-size:22px; }
       
-      /* Filters Grid for Mobile */
       .filters{ 
         display: grid;
         grid-template-columns: 1fr;
@@ -886,6 +1029,8 @@
       }
 
       .stats-grid{ grid-template-columns:repeat(2, 1fr); gap: 12px; }
+      #salaryGrid{ grid-template-columns:repeat(2, 1fr); }
+      #salaryGrid .stat-card:last-child{ grid-column: 1 / -1; }
       .stat-card { padding: 14px; }
       .stat-card .value { font-size: 22px; }
 
@@ -906,7 +1051,10 @@
       .holiday-modal{ max-width:100%; padding:16px; }
       .holiday-cal-day{ min-height:30px; font-size:12px; }
 
-      /* ---- Details Table -> Card View on Mobile ---- */
+      .cal-grid{ gap:4px; }
+      .cal-cell{ min-height:86px; padding:6px; border-radius:8px; }
+      .cal-agent .nm{ font-size:10px; }
+
       #schedTableShell{
         border:none;
         box-shadow:none;
@@ -969,11 +1117,13 @@
     <button class="nav-btn active" data-view="todayView">Today's Schedule</button>
     <button class="nav-btn" data-view="detailsView">All Entries</button>
     <button class="nav-btn" data-view="agentView">Agent History</button>
+    <button class="nav-btn" data-view="calendarView">Calendar</button>
+    <button class="nav-btn" data-view="swapView">Swap Helper</button>
+    <button class="nav-btn" data-view="otView">OT</button>
   </nav>
 
   <!-- ========== TODAY VIEW ========== -->
   <div id="todayView">
-    <!-- Date Navigation Buttons -->
     <div class="date-nav" id="dateNav"></div>
 
     <div class="hero-date" id="heroDate">Loading date…</div>
@@ -1102,6 +1252,11 @@
             <span class="value" id="salaryTravel">৳0</span>
             <span class="sub" id="salaryTravelSub">Based on shift timing</span>
           </div>
+          <div class="stat-card">
+            <span class="label">Overtime (OT)</span>
+            <span class="value" id="salaryOT">৳0</span>
+            <span class="sub" id="salaryOTSub">No OT recorded</span>
+          </div>
           <div class="stat-card warning">
             <span class="label">KPI Bonus</span>
             <span class="value" id="salaryKPI">৳0</span>
@@ -1110,8 +1265,13 @@
           <div class="stat-card neutral">
             <span class="label">Grand Total</span>
             <span class="value" id="salaryTotal">৳0</span>
-            <span class="sub">Salary + travel + KPI</span>
+            <span class="sub">Salary + travel + OT + KPI</span>
           </div>
+        </div>
+
+        <div id="otLogWrap" style="display:none; margin-top:16px;">
+          <div style="font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">OT Entries (this range)</div>
+          <div id="otLogList"></div>
         </div>
       </div>
     </div>
@@ -1162,9 +1322,133 @@
     <div class="state-msg" id="stateMsgAgent">Please select an agent to view their shift history.</div>
   </div>
 
+  <!-- ========== CALENDAR VIEW ========== -->
+  <div id="calendarView" style="display:none;">
+    <div class="cal-header">
+      <span class="cal-title" id="calTitle"></span>
+      <div class="cal-nav">
+        <button id="calPrev" type="button">‹ Prev</button>
+        <button id="calThis" type="button">This Month</button>
+        <button id="calNext" type="button">Next ›</button>
+      </div>
+    </div>
+    <div class="cal-legend">
+      <span><i class="eu"></i> EU</span>
+      <span><i class="glo"></i> GLO</span>
+      <span><i class="udp"></i> UDP</span>
+      <span><i class="other"></i> Other</span>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+
+  <!-- ========== SWAP HELPER VIEW ========== -->
+  <div id="swapView" style="display:none;">
+    <div class="filters">
+      <div class="field">
+        <label for="swapDate">Duty Date</label>
+        <input type="date" id="swapDate">
+      </div>
+      <div class="field grow">
+        <label for="swapAgent">Your Name</label>
+        <select id="swapAgent"><option value="">— Select your name —</option></select>
+      </div>
+    </div>
+    <div id="swapResult"></div>
+    <div class="state-msg" id="swapMsg" style="display:block;">
+      Pick a date and your name to see swap-eligible agents (same region only).
+    </div>
+  </div>
+
+  <!-- ========== OT VIEW (redesigned) ========== -->
+  <div id="otView" style="display:none;">
+    <div class="ot-hero">
+      <div>
+        <div class="ot-hero-title">Overtime Tracker</div>
+        <div class="ot-hero-sub">Team OT summary for the selected period — payment rate ৳61/hour.</div>
+      </div>
+      <button type="button" class="ot-add-btn" id="openOTModalBtn">＋ Add OT Entry</button>
+    </div>
+
+    <div class="stat-row" id="otStatRow"></div>
+
+    <div class="filters">
+      <div class="field">
+        <label for="otStartDate">Start Date</label>
+        <input type="date" id="otStartDate">
+      </div>
+      <div class="field">
+        <label for="otEndDate">End Date</label>
+        <input type="date" id="otEndDate">
+      </div>
+      <button class="reset-btn" id="otRangeResetBtn">Reset Range</button>
+    </div>
+
+    <div class="table-header">
+      OT Summary <span class="badge" id="otSummaryBadge">0 entries</span>
+    </div>
+    <div class="table-shell" id="otSummaryShell">
+      <table id="otSummaryTable">
+        <thead>
+          <tr>
+            <th style="width:50px;">#</th>
+            <th>Agent Name</th>
+            <th>Entries</th>
+            <th>Total OT Hours</th>
+            <th>Amount (৳61/hr)</th>
+          </tr>
+        </thead>
+        <tbody id="otSummaryBody"></tbody>
+        <tfoot id="otSummaryFoot"></tfoot>
+      </table>
+    </div>
+    <div class="state-msg" id="otSummaryMsg" style="display:none;">No OT entries found in this date range.</div>
+  </div>
+
   <footer class="note">
     No login required — everyone can view this. Refresh the page after changes in the Sheet to see updated data.
   </footer>
+
+  <!-- ========== OT SUBMIT MODAL ========== -->
+  <div class="ot-modal-overlay" id="otModalOverlay" style="display:none;">
+    <div class="ot-modal">
+      <div class="ot-modal-header">
+        <span class="ot-modal-title">Add OT Entry</span>
+        <button type="button" class="ot-modal-close" id="otModalCloseX">&times;</button>
+      </div>
+      <div class="ot-modal-body">
+        <div class="field">
+          <label for="otDate">OT Date</label>
+          <input type="date" id="otDate">
+        </div>
+        <div class="field">
+          <label for="otName">Agent Name</label>
+          <select id="otName"><option value="">— Select agent —</option></select>
+        </div>
+        <div class="field">
+          <label for="otHours">Hours</label>
+          <select id="otHours">
+            <option value="">—</option>
+            <option value="0.5">0.5</option>
+            <option value="1">1</option>
+            <option value="1.5">1.5</option>
+            <option value="2">2</option>
+            <option value="2.5">2.5</option>
+            <option value="3">3</option>
+            <option value="3.5">3.5</option>
+            <option value="4">4</option>
+            <option value="4.5">4.5</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+          </select>
+        </div>
+      </div>
+      <div class="ot-modal-msg" id="otModalMsg"></div>
+      <div class="ot-modal-footer">
+        <button type="button" class="ot-modal-cancel" id="otModalCancel">Cancel</button>
+        <button type="button" class="ot-modal-save" id="otSubmitBtn">Save OT</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ========== CUSTOM HOLIDAY MULTI-SELECT MODAL ========== -->
   <div class="holiday-modal-overlay" id="holidayModalOverlay" style="display:none;">
@@ -1189,18 +1473,34 @@
 
 <script>
   /* ==============================================================
+     SMALL HELPERS
+     ============================================================== */
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+      ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function isOffShift(s){ return /^off$/i.test(String(s || '').trim()); }
+  function initialsOf(r){
+    const nm = (r.agentName && r.agentName.trim().toUpperCase() !== 'N/A') ? r.agentName : (r.systemId || '?');
+    return nm.trim().split(/\s+/).slice(0,2).map(w => w[0] || '').join('').toUpperCase() || '?';
+  }
+  function fmtHrs(h){ return (h % 1 === 0) ? String(h) : h.toFixed(1); }
+
+  /* ==============================================================
      SHARED LOGIC & CONFIG
      ============================================================== */
   const CONFIG = {
     SHEET_ID: "1qIhXOv2jU2pQagJbzkYms1vAQ9JPtAhwSNmibGfFZS4",
     SHEET_NAME: "Schedule",
-    REFRESH_MS: 900000 // 5 minutes
+    OT_SHEET_NAME: "Form_Responses",
+    OT_RATE: 61,
+    OT_API_URL: "https://script.google.com/macros/s/AKfycbz5WAi6CPycGwv9VpdGIJA7dz2he96fk5S4ZY1IYFmA5SvQGdMaonR4ijsGSBMvuMXqAQ/exec",
+    REFRESH_MS: 900000
   };
 
   const csvUrl = () =>
     `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(CONFIG.SHEET_NAME)}&_=${Date.now()}`;
 
-  // ---- Custom CSV Parser ----
   function parseCSV(text){
     const rows = [];
     let row = [], field = '', inQuotes = false;
@@ -1252,14 +1552,11 @@
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   }
 
-  // Normalizes an agent name so that spelling variants (dots, extra spaces,
-  // inconsistent case - e.g. "Md. Sajib Uddin" vs "Md Sajib Uddin" vs
-  // "sajib uddin") are all treated as the SAME agent.
   function normalizeAgentName(name){
     return (name || '')
       .toLowerCase()
-      .replace(/\./g, '')      // remove periods ("Md." -> "Md")
-      .replace(/\s+/g, ' ')    // collapse multiple spaces
+      .replace(/\./g, '')
+      .replace(/\s+/g, ' ')
       .trim();
   }
 
@@ -1270,6 +1567,53 @@
     if(r === 'UDP') return 'udp';
     if(r === 'OFF') return 'off';
     return 'other';
+  }
+
+  function parseOTDate(raw){
+    if(!raw) return null;
+    raw = String(raw).trim();
+    const iso = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if(iso) return new Date(+iso[1], +iso[2]-1, +iso[3]);
+    let m = raw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+    if(m){
+      const a = parseInt(m[1],10), b = parseInt(m[2],10);
+      const yr = m[3].length===2 ? 2000+parseInt(m[3]) : parseInt(m[3]);
+      let day, mon;
+      if(a > 12){ day = a; mon = b; } else { mon = a; day = b; }
+      if(mon < 1 || mon > 12 || day < 1 || day > 31) return null;
+      return new Date(yr, mon-1, day);
+    }
+    const d = new Date(raw);
+    return isNaN(d) ? null : d;
+  }
+
+  async function fetchOvertimeRows(){
+    const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(CONFIG.OT_SHEET_NAME)}&_=${Date.now()}`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('OT fetch failed');
+    const rows = parseCSV(await res.text());
+    if(rows.length < 2) return [];
+    const header = rows[0].map(h => h.trim().toLowerCase());
+    const idx = {
+      date:  header.findIndex(h => h.includes('date')),
+      name:  header.findIndex(h => h.includes('agent') || h.includes('name')),
+      hours: header.findIndex(h => h.includes('hour')),
+    };
+    const out = [];
+    rows.slice(1).forEach(r => {
+      const d = parseOTDate(r[idx.date] || '');
+      const name = (r[idx.name] || '').trim();
+      const hours = parseFloat(String(r[idx.hours] ?? '').replace(/[^\d.]/g,''));
+      if(!d || isNaN(d) || !name || !isFinite(hours) || hours <= 0 || hours > 24) return;
+      out.push({
+        sortKey: getSortKeyFromDate(d),
+        display: `${String(d.getDate()).padStart(2,'0')} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]} ${d.getFullYear()}`,
+        agentName: name,
+        agentKey: normalizeAgentName(name),
+        hours: hours
+      });
+    });
+    return out;
   }
 
   async function fetchScheduleRows(){
@@ -1307,12 +1651,13 @@
 
   /* ========== GLOBAL STATE & DATA ========== */
   let ALL_ROWS = [];
-  let SELECTED_SORT_KEY = getSortKeyFromDate(new Date()); // Defaults to today
+  let OT_ROWS = [];
+  let SELECTED_SORT_KEY = getSortKeyFromDate(new Date());
   let salaryVisible = false;
   let selectedKpiCategory = '';
-  let customHolidays = new Set(); // sortKeys ('YYYY-MM-DD') marked as custom holiday
-  let tempHolidaySelection = new Set(); // working copy edited inside the modal, committed on OK
-  let holidayCalCursor = new Date(); // month currently shown in the modal calendar
+  let customHolidays = new Set();
+  let tempHolidaySelection = new Set();
+  let holidayCalCursor = new Date();
   let detailsSortColumn = 'date';
   let detailsSortDirection = 'asc';
   let detailsCurrentPage = 1;
@@ -1328,6 +1673,12 @@
       document.getElementById('todayView').style.display = targetId === 'todayView' ? 'block' : 'none';
       document.getElementById('detailsView').style.display = targetId === 'detailsView' ? 'block' : 'none';
       document.getElementById('agentView').style.display = targetId === 'agentView' ? 'block' : 'none';
+      document.getElementById('calendarView').style.display = targetId === 'calendarView' ? 'block' : 'none';
+      document.getElementById('swapView').style.display = targetId === 'swapView' ? 'block' : 'none';
+      document.getElementById('otView').style.display = targetId === 'otView' ? 'block' : 'none';
+      if(targetId === 'calendarView') renderCalendar();
+      if(targetId === 'swapView') renderSwap();
+      if(targetId === 'otView') renderOTSummary();
     });
   });
 
@@ -1341,7 +1692,6 @@
   function renderDateNav() {
     const today = new Date();
     const dates = [];
-    // 7 days back through 14 days ahead, for a scrollable strip
     for(let i = -7; i <= 14; i++) {
       const d = new Date(today);
       d.setDate(today.getDate() + i);
@@ -1359,16 +1709,14 @@
       </button>`;
     }).join('');
 
-    // Attach event listeners
     document.querySelectorAll('.date-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         SELECTED_SORT_KEY = btn.dataset.key;
-        renderDateNav(); // Update active state
-        renderTodayView(); // Re-render stats and groups
+        renderDateNav();
+        renderTodayView();
       });
     });
 
-    // Keep the selected date scrolled into view
     const activeBtn = dateNavEl.querySelector('.date-btn.active');
     if(activeBtn) activeBtn.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
   }
@@ -1383,12 +1731,11 @@
   function renderStats(targetRows){
     const counts = {eu:0, glo:0, udp:0};
     targetRows.forEach(r => {
-      if(/^off$/i.test(r.shift.trim())) return; // Skip OFF shifts
+      if(/^off$/i.test(r.shift.trim())) return;
       const cls = regionPillClass(r.region);
       if(counts[cls] !== undefined) counts[cls]++;
     });
     
-    // OFF card removed as per request
     document.getElementById('statRow').innerHTML = `
       <div class="stat-chip eu"><span class="n">${counts.eu}</span><span class="l">On duty in EU</span></div>
       <div class="stat-chip glo"><span class="n">${counts.glo}</span><span class="l">On duty in GLO</span></div>
@@ -1428,7 +1775,7 @@
       return `
         <div class="shift-group ${isOff ? 'off-group' : ''}">
           <div class="shift-group-header">
-            <span class="name">${key}</span>
+            <span class="name">${esc(key)}</span>
             <span class="count">${rows.length} agents</span>
           </div>
           <div class="agent-list">
@@ -1440,12 +1787,12 @@
               const regionCls = regionPillClass(r.region);
               return `
               <div class="agent-row">
-                <span class="avatar ${regionCls}">${initials}</span>
+                <span class="avatar ${regionCls}">${esc(initials)}</span>
                 <span class="agent-info">
-                  <span class="name">${displayName}</span>
-                  ${showId ? `<span class="sysid">ID: ${r.systemId}</span>` : ''}
+                  <span class="name">${esc(displayName)}</span>
+                  ${showId ? `<span class="sysid">ID: ${esc(r.systemId)}</span>` : ''}
                 </span>
-                <span class="pill ${regionCls}">${r.region}</span>
+                <span class="pill ${regionCls}">${esc(r.region)}</span>
               </div>
             `;}).join('')}
           </div>
@@ -1466,7 +1813,7 @@
     const el = document.getElementById(id);
     const current = el.value;
     el.innerHTML = '<option value="">All</option>' +
-      values.map(v => `<option value="${v}">${v}</option>`).join('');
+      values.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
     if(values.includes(current)) el.value = current;
   }
 
@@ -1497,7 +1844,7 @@
       }
       if(av < bv) return -1 * dir;
       if(av > bv) return 1 * dir;
-      return a.sortKey.localeCompare(b.sortKey); // stable tie-breaker
+      return a.sortKey.localeCompare(b.sortKey);
     });
 
     const tbody = document.getElementById('tbodyDetails');
@@ -1521,11 +1868,11 @@
       tbody.innerHTML = pageRows.map(r => {
         const isOff = /^off$/i.test(r.shift.trim());
         return `<tr class="${isOff ? 'off-row' : ''}">
-          <td>${r.display}</td>
-          <td>${isOff ? '<span class="off-tag">OFF</span>' : r.shift}</td>
-          <td>${r.systemId}</td>
-          <td>${r.agentName}</td>
-          <td><span class="pill ${regionPillClass(r.region)}">${r.region}</span></td>
+          <td>${esc(r.display)}</td>
+          <td>${isOff ? '<span class="off-tag">OFF</span>' : esc(r.shift)}</td>
+          <td>${esc(r.systemId)}</td>
+          <td>${esc(r.agentName)}</td>
+          <td><span class="pill ${regionPillClass(r.region)}">${esc(r.region)}</span></td>
         </tr>`;
       }).join('');
       renderDetailsPagination(totalRows, totalPages, startIdx, pageRows.length);
@@ -1534,7 +1881,7 @@
     const rangeStart = totalRows === 0 ? 0 : startIdx + 1;
     const rangeEnd = startIdx + pageRows.length;
     document.getElementById('summary').innerHTML =
-      `Showing <b>${rangeStart}–${rangeEnd}</b> of <b>${totalRows}</b> entries${agentQ ? ` — for "${document.getElementById('fAgent').value.trim()}"` : ''}`;
+      `Showing <b>${rangeStart}–${rangeEnd}</b> of <b>${totalRows}</b> entries${agentQ ? ` — for "${esc(document.getElementById('fAgent').value.trim())}"` : ''}`;
 
     updateSortArrows();
   }
@@ -1626,7 +1973,7 @@
     titleEl.textContent = `${monthsEn[month]} ${year}`;
 
     const firstDay = new Date(year, month, 1);
-    const startWeekday = firstDay.getDay(); // 0=Sun
+    const startWeekday = firstDay.getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const todayKey = getSortKeyFromDate(new Date());
 
@@ -1654,7 +2001,7 @@
   }
 
   function openHolidayModal(){
-    tempHolidaySelection = new Set(customHolidays); // start from what's already saved
+    tempHolidaySelection = new Set(customHolidays);
     holidayCalCursor = new Date();
     document.getElementById('holidayModalOverlay').style.display = 'flex';
     renderHolidayModalCalendar();
@@ -1673,7 +2020,7 @@
     renderHolidayModalCalendar();
   });
   document.getElementById('holidayModalOk').addEventListener('click', () => {
-    customHolidays = new Set(tempHolidaySelection); // commit selection
+    customHolidays = new Set(tempHolidaySelection);
     closeHolidayModal();
     renderHolidayList();
     renderHistory();
@@ -1681,7 +2028,7 @@
   document.getElementById('holidayModalCancel').addEventListener('click', closeHolidayModal);
   document.getElementById('holidayModalCloseX').addEventListener('click', closeHolidayModal);
   document.getElementById('holidayModalOverlay').addEventListener('click', (e) => {
-    if(e.target.id === 'holidayModalOverlay') closeHolidayModal(); // click outside the card
+    if(e.target.id === 'holidayModalOverlay') closeHolidayModal();
   });
   document.getElementById('clearHolidaysBtn').addEventListener('click', () => {
     customHolidays.clear();
@@ -1691,12 +2038,11 @@
 
   /* ========== SALARY CALCULATION ========== */
   const SALARY_PER_DAY = 490;
-  const HOLIDAY_BONUS_PER_DAY = 510; // extra amount added ON TOP of SALARY_PER_DAY for duty on a custom holiday
+  const HOLIDAY_BONUS_PER_DAY = 510;
   const KPI_MIN_DUTY_DAYS = 17;
   const KPI_VALUES = { '': 0, A: 2700, B: 2025, C: 675 };
   const KPI_LABELS = { '': 'No category selected', A: 'Category A selected', B: 'Category B selected', C: 'Category C selected' };
 
-  // Parses a single time token like "10pm", "10:30pm", "5am", "22:00" -> minutes since midnight (0-1439)
   function parseTimeToken(token){
     if(!token) return null;
     token = token.trim();
@@ -1715,23 +2061,16 @@
     return hour * 60 + minute;
   }
 
-  // Parses a shift string like "1pm-10pm" or "10pm-7am" into {startMin, endMin}
   function parseShiftRange(shiftStr){
     if(!shiftStr) return null;
     const parts = shiftStr.split(/-|–|to/i).map(s => s.trim()).filter(Boolean);
     if(parts.length < 2) return null;
     let startMin = parseTimeToken(parts[0]);
     let endMin = parseTimeToken(parts[1]);
-    // If start has no am/pm but end does, try inheriting end's meridiem info isn't reliable enough — leave as-is.
     if(startMin === null || endMin === null) return null;
     return { startMin, endMin };
   }
 
-  // A row only counts as an actual duty/working day when its shift value
-  // parses into a real time range. This naturally excludes "OFF",
-  // "Resigned", blank cells, "N/A", or any other non-time status — so
-  // salary, travel allowance and duty-day stats are never counted for
-  // days with no real shift time.
   function hasShiftTime(shiftStr){
     return parseShiftRange(shiftStr) !== null;
   }
@@ -1747,7 +2086,7 @@
     const TEN_PM = 22 * 60;
     const FIVE_AM = 5 * 60;
 
-    if(endMin === TEN_PM){ // shift ends exactly at 10:00 PM
+    if(endMin === TEN_PM){
       return 45;
     }
 
@@ -1788,9 +2127,22 @@
       }
     });
 
+    /* ---- OT calculation ---- */
+    const agentKey = document.getElementById('agentSelect').value;
+    const sv = document.getElementById('startDate').value;
+    const ev = document.getElementById('endDate').value;
+    const otRows = OT_ROWS.filter(r => {
+      if(r.agentKey !== agentKey) return false;
+      if(sv && r.sortKey < sv) return false;
+      if(ev && r.sortKey > ev) return false;
+      return true;
+    });
+    const otHours = otRows.reduce((s,r) => s + r.hours, 0);
+    const otPay = Math.round(otHours * CONFIG.OT_RATE);
+
     const kpiEligible = dutyDaysWorked >= KPI_MIN_DUTY_DAYS;
     const kpiBonus = kpiEligible ? (KPI_VALUES[kpiCategory] || 0) : 0;
-    const grandTotal = dutyPayTotal + travelTotal + kpiBonus;
+    const grandTotal = dutyPayTotal + travelTotal + kpiBonus + otPay;
 
     document.getElementById('salaryDutyPay').textContent = fmtTk(dutyPayTotal);
     let dutySubText = `${normalDutyDays} days × ৳${SALARY_PER_DAY}`;
@@ -1814,6 +2166,28 @@
     document.getElementById('salaryTotal').textContent = fmtTk(grandTotal);
     document.getElementById('salaryPreview').textContent = fmtTk(grandTotal);
 
+    document.getElementById('salaryOT').textContent = fmtTk(otPay);
+    document.getElementById('salaryOTSub').textContent =
+      otRows.length
+        ? `${fmtHrs(otHours)} hrs × ৳${CONFIG.OT_RATE} · ${otRows.length} entry${otRows.length > 1 ? 's' : ''}`
+        : 'No OT recorded';
+
+    const otLogWrap = document.getElementById('otLogWrap');
+    const otLogList = document.getElementById('otLogList');
+    if(otRows.length){
+      otLogList.innerHTML = otRows.slice()
+        .sort((a,b) => a.sortKey.localeCompare(b.sortKey))
+        .map(r => `
+          <div class="ot-log-item">
+            <span class="ot-date">${esc(r.display)}</span>
+            <span>${fmtHrs(r.hours)} hr${r.hours === 1 ? '' : 's'}</span>
+            <span class="ot-amt">${fmtTk(Math.round(r.hours * CONFIG.OT_RATE))}</span>
+          </div>`).join('');
+      otLogWrap.style.display = 'block';
+    } else {
+      otLogWrap.style.display = 'none';
+    }
+
     salaryPanel.style.display = 'block';
     salaryPanel.classList.toggle('open', salaryVisible);
     toggleBtn.setAttribute('aria-expanded', salaryVisible ? 'true' : 'false');
@@ -1824,9 +2198,6 @@
 
   /* ========== AGENT HISTORY VIEW RENDER ========== */
   function populateAgents(){
-    // Group rows by normalized key so spelling variants collapse into one
-    // agent. For the label shown in the dropdown, pick whichever raw
-    // spelling occurs most often for that key.
     const keyToNameCounts = {};
     ALL_ROWS.forEach(r => {
       if(!r.agentKey) return;
@@ -1841,25 +2212,50 @@
 
     const select = document.getElementById('agentSelect');
     select.innerHTML = '<option value="">-- Select Agent --</option>' + 
-      agentEntries.map(e => `<option value="${e.key}">${e.name}</option>`).join('');
+      agentEntries.map(e => `<option value="${esc(e.key)}">${esc(e.name)}</option>`).join('');
+  }
+
+  function agentDisplayName(agentKey){
+    const counts = {};
+    ALL_ROWS.forEach(r => {
+      if(r.agentKey === agentKey) counts[r.agentName] = (counts[r.agentName] || 0) + 1;
+    });
+    const names = Object.keys(counts).sort((a,b) => counts[b]-counts[a]);
+    return names[0] || agentKey;
+  }
+
+  function agentRegionClass(agentKey){
+    const tally = {};
+    ALL_ROWS.filter(r => r.agentKey === agentKey).forEach(r => {
+      const c = regionPillClass(r.region);
+      if(c !== 'off' && c !== 'other') tally[c] = (tally[c] || 0) + 1;
+    });
+    const keys = Object.keys(tally).sort((a,b) => tally[b]-tally[a]);
+    return keys[0] || 'other';
+  }
+
+  function agentInitials(agentKey){
+    return agentDisplayName(agentKey).trim().split(/\s+/).slice(0,2).map(w => w[0]).join('').toUpperCase() || '?';
   }
 
   function setDefaultDates(){
-    const today = new Date();
-    const formatStr = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const r = defaultRangeStrings();
+    document.getElementById('startDate').value = r.s;
+    document.getElementById('endDate').value = r.e;
+  }
 
-    // Start date default: 15th of previous month.
-    // Once the 16th of the current month has passed, default becomes the 15th of the current month.
+  // Default range: 15th of previous month (or current month if today >= 16th) → today
+  function defaultRangeStrings(){
+    const today = new Date();
     let startYear = today.getFullYear();
     let startMonth = today.getMonth();
     if(today.getDate() < 16){
-      startMonth -= 1; // go to previous month
+      startMonth -= 1;
       if(startMonth < 0){ startMonth = 11; startYear -= 1; }
     }
-    const startDay = new Date(startYear, startMonth, 15);
-
-    document.getElementById('startDate').value = formatStr(startDay);
-    document.getElementById('endDate').value = formatStr(today);
+    const s = `${startYear}-${String(startMonth+1).padStart(2,'0')}-15`;
+    const e = getSortKeyFromDate(today);
+    return { s, e };
   }
 
   function renderHistory(){
@@ -1888,7 +2284,6 @@
       return true;
     });
 
-    // Calculate duty days and stats based on existing filtered records
     let dutyDays = 0;
     let shiftCounts = {};
     let regions = new Set();
@@ -1901,16 +2296,15 @@
       }
     });
 
-    // Calculate total days in range
     let totalDaysInRange = 0;
     const start = new Date(startDateStr + 'T00:00:00');
     const end = new Date(endDateStr + 'T00:00:00');
 
     if (!isNaN(start) && !isNaN(end)) {
       const diffTime = Math.abs(end - start);
-      totalDaysInRange = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include start date
+      totalDaysInRange = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
     } else {
-      totalDaysInRange = filtered.length; // fallback
+      totalDaysInRange = filtered.length;
     }
 
     let offDays = totalDaysInRange - dutyDays;
@@ -1934,15 +2328,14 @@
 
     renderSalary(filtered);
 
-    // --- CODE TO ADD MISSING DAYS AS "OFF" ---
     let tableRows = [];
 
     if (isNaN(start) || isNaN(end)) {
       tableRows = filtered;
     } else {
       let current = new Date(start);
-      const monthsEn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      const daysEn = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const monthsLocal = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const daysLocal = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
       
       while(current <= end) {
         let sortKey = `${current.getFullYear()}-${String(current.getMonth()+1).padStart(2,'0')}-${String(current.getDate()).padStart(2,'0')}`;
@@ -1954,8 +2347,8 @@
           const dd = String(current.getDate()).padStart(2,'0');
           tableRows.push({
             sortKey: sortKey,
-            display: `${dd} ${monthsEn[current.getMonth()]} ${current.getFullYear()}`,
-            dayName: daysEn[current.getDay()],
+            display: `${dd} ${monthsLocal[current.getMonth()]} ${current.getFullYear()}`,
+            dayName: daysLocal[current.getDay()],
             shift: 'OFF',
             region: '-',
             systemId: '-'
@@ -1979,12 +2372,16 @@
     tbody.innerHTML = tableRows.map(r => {
       const isOff = r.shift.trim().toUpperCase() === 'OFF';
       const pillClass = isOff ? 'off' : regionPillClass(r.region);
+      const otHrs = OT_ROWS
+        .filter(o => o.agentKey === agent && o.sortKey === r.sortKey)
+        .reduce((s,o) => s + o.hours, 0);
+      const otTag = otHrs > 0 ? ` <span class="ot-tag">OT ${fmtHrs(otHrs)}h</span>` : '';
       return `<tr class="${isOff ? 'off-row' : ''}">
-        <td>${r.display}</td>
-        <td style="color:var(--muted); font-weight:500;">${r.dayName}</td>
-        <td><span class="pill ${pillClass}">${r.shift}</span></td>
-        <td>${r.region || '-'}</td>
-        <td style="color:var(--muted);">${r.systemId || '-'}</td>
+        <td>${esc(r.display)}</td>
+        <td style="color:var(--muted); font-weight:500;">${esc(r.dayName)}</td>
+        <td><span class="pill ${pillClass}">${esc(r.shift)}</span>${otTag}</td>
+        <td>${esc(r.region || '-')}</td>
+        <td style="color:var(--muted);">${esc(r.systemId || '-')}</td>
       </tr>`;
     }).join('');
     
@@ -1992,37 +2389,440 @@
     stateMsg.style.display = 'none';
   }
 
+  /* ========== CALENDAR VIEW ========== */
+  let calCursor = new Date();
+
+  function renderCalendar(){
+    const grid = document.getElementById('calGrid');
+    if(!grid) return;
+    if(!ALL_ROWS.length){ grid.innerHTML = ''; return; }
+
+    const y = calCursor.getFullYear(), m = calCursor.getMonth();
+    document.getElementById('calTitle').textContent = monthsEn[m] + ' ' + y;
+
+    const byDate = {};
+    ALL_ROWS.forEach(r => {
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(r.sortKey || '')) return;
+      (byDate[r.sortKey] = byDate[r.sortKey] || []).push(r);
+    });
+
+    const todayKey = getSortKeyFromDate(new Date());
+    const first = new Date(y, m, 1);
+    const gridStart = new Date(y, m, 1 - first.getDay());
+    const MAX_SHOW = 3;
+
+    let html = weekdaysShortEn.map(d => `<div class="cal-dow">${d}</div>`).join('');
+
+    for(let i = 0; i < 42; i++){
+      const d = new Date(gridStart);
+      d.setDate(gridStart.getDate() + i);
+      const key = getSortKeyFromDate(d);
+      const inMonth = d.getMonth() === m;
+      const dayRows = byDate[key] || [];
+      const onDuty = dayRows.filter(r => hasShiftTime(r.shift));
+      const offN = dayRows.length - onDuty.length;
+
+      const cls = ['cal-cell'];
+      if(!inMonth) cls.push('other-month');
+      if(key === todayKey) cls.push('is-today');
+      if(key === SELECTED_SORT_KEY) cls.push('is-sel');
+
+      let inner = '';
+      if(inMonth){
+        inner = onDuty.slice(0, MAX_SHOW).map(r =>
+          `<span class="cal-agent"><i class="${regionPillClass(r.region)}"></i><span class="nm">${esc(r.agentName && r.agentName.trim().toUpperCase() !== 'N/A' ? r.agentName : r.systemId)}</span></span>`
+        ).join('');
+        if(onDuty.length > MAX_SHOW) inner += `<span class="cal-more">+${onDuty.length - MAX_SHOW} more</span>`;
+        if(offN > 0) inner += `<span class="cal-offn">${offN} off</span>`;
+      }
+      html += `<div class="${cls.join(' ')}" data-key="${key}">
+        <span class="cal-day-num">${d.getDate()}</span>
+        <div class="cal-agents">${inner}</div>
+      </div>`;
+    }
+    grid.innerHTML = html;
+
+    grid.querySelectorAll('.cal-cell[data-key]').forEach(c => {
+      c.addEventListener('click', () => {
+        SELECTED_SORT_KEY = c.dataset.key;
+        renderDateNav();
+        renderTodayView();
+        document.querySelector('.nav-btn[data-view="todayView"]').click();
+      });
+    });
+  }
+
+  document.getElementById('calPrev').addEventListener('click', () => { calCursor.setMonth(calCursor.getMonth() - 1); renderCalendar(); });
+  document.getElementById('calNext').addEventListener('click', () => { calCursor.setMonth(calCursor.getMonth() + 1); renderCalendar(); });
+  document.getElementById('calThis').addEventListener('click', () => { calCursor = new Date(); renderCalendar(); });
+
+  /* ========== SWAP HELPER ========== */
+  function swapRegionGroup(region){
+    const cls = regionPillClass(region);
+    if(cls === 'other' || cls === 'off') return 'RAW:' + String(region || '').trim().toUpperCase();
+    return cls;
+  }
+
+  function mostCommonRegion(agentKey){
+    const tally = {};
+    ALL_ROWS.filter(r => r.agentKey === agentKey && hasShiftTime(r.shift)).forEach(r => {
+      const g = swapRegionGroup(r.region);
+      tally[g] = (tally[g] || 0) + 1;
+    });
+    let best = '', n = 0;
+    Object.keys(tally).forEach(g => { if(tally[g] > n){ best = g; n = tally[g]; } });
+    return best.replace(/^RAW:/, '');
+  }
+
+  function buildSwapOptions(){
+    const sel = document.getElementById('swapAgent');
+    if(!sel) return;
+    const keyToNameCounts = {};
+    ALL_ROWS.forEach(r => {
+      if(!r.agentKey) return;
+      keyToNameCounts[r.agentKey] = keyToNameCounts[r.agentKey] || {};
+      keyToNameCounts[r.agentKey][r.agentName] = (keyToNameCounts[r.agentKey][r.agentName] || 0) + 1;
+    });
+    const entries = Object.keys(keyToNameCounts).map(key => {
+      const counts = keyToNameCounts[key];
+      return { key, name: Object.keys(counts).sort((a,b) => counts[b]-counts[a])[0] };
+    }).sort((a,b) => a.name.localeCompare(b.name));
+
+    const current = sel.value;
+    sel.innerHTML = '<option value="">— Select your name —</option>' +
+      entries.map(e => `<option value="${esc(e.key)}">${esc(e.name)}</option>`).join('');
+    if(entries.some(e => e.key === current)) sel.value = current;
+  }
+
+  function renderSwap(){
+    const dateEl = document.getElementById('swapDate');
+    const selEl = document.getElementById('swapAgent');
+    const resultEl = document.getElementById('swapResult');
+    const msgEl = document.getElementById('swapMsg');
+    if(!dateEl || !selEl) return;
+
+    if(!dateEl.value) dateEl.value = getSortKeyFromDate(new Date());
+
+    const key = dateEl.value;
+    const agentKey = selEl.value;
+    resultEl.innerHTML = '';
+
+    if(!key || !agentKey){
+      msgEl.style.display = 'block';
+      msgEl.textContent = 'Pick a date and your name to see swap-eligible agents (same region only).';
+      return;
+    }
+    msgEl.style.display = 'none';
+
+    const dayRows = ALL_ROWS.filter(r => r.sortKey === key);
+    if(!dayRows.length){
+      msgEl.style.display = 'block';
+      msgEl.textContent = 'No schedule entries found for this date.';
+      return;
+    }
+
+    const mine = dayRows.find(r => r.agentKey === agentKey);
+    const meRow = ALL_ROWS.find(r => r.agentKey === agentKey);
+    const myName = meRow ? meRow.agentName : agentKey;
+
+    if(mine && hasShiftTime(mine.shift)){
+      const myGroup = swapRegionGroup(mine.region);
+      const myRange = parseShiftRange(mine.shift);
+
+      let eligible = [], sameShift = [], diffRegion = 0, skippedOther = 0;
+      dayRows.forEach(r => {
+        if(r.agentKey === agentKey) return;
+        if(swapRegionGroup(r.region) !== myGroup){ diffRegion++; return; }
+        if(isOffShift(r.shift)){ eligible.push({ r, why:'off' }); return; }
+        if(hasShiftTime(r.shift)){
+          const rr = parseShiftRange(r.shift);
+          if(myRange && rr && rr.startMin === myRange.startMin){ sameShift.push(r); return; }
+          eligible.push({ r, why:'diff' });
+        } else {
+          skippedOther++;
+        }
+      });
+
+      eligible.sort((a,b) =>
+        ((a.why === 'off' ? 0 : 1) - (b.why === 'off' ? 0 : 1)) ||
+        String(a.r.shift).localeCompare(String(b.r.shift)) ||
+        String(a.r.agentName).localeCompare(String(b.r.agentName)));
+
+      resultEl.innerHTML = `
+        <div class="swap-me">
+          <span class="who">${esc(myName)}</span>
+          <span class="meta">${esc(mine.display)} · Shift: <b>${esc(mine.shift)}</b> · Region: <b>${esc(mine.region)}</b></span>
+        </div>
+        <div class="swap-list-title">Eligible Swap Partners <span class="badge">${eligible.length} found</span></div>
+        ${eligible.length ? eligible.map(({r, why}) => `
+          <div class="swap-item">
+            <span class="avatar ${regionPillClass(r.region)}">${esc(initialsOf(r))}</span>
+            <span class="info">
+              <div class="nm">${esc(r.agentName || r.systemId)}</div>
+              <div class="sid">${r.systemId && r.systemId !== r.agentName ? 'ID: ' + esc(r.systemId) + ' · ' : ''}${why === 'off' ? 'OFF that day — can cover your shift' : 'On ' + esc(r.shift) + ' — shift exchange possible'}</div>
+            </span>
+            <span class="pill ${regionPillClass(r.region)}">${esc(r.region)}</span>
+            <span class="why ${why}">${why === 'off' ? 'OFF' : esc(r.shift)}</span>
+          </div>`).join('')
+        : `<div class="state-msg">No eligible partners in <b>${esc(mine.region)}</b> region that day.</div>`}
+        ${sameShift.length ? `
+          <div class="swap-list-title">Same shift — not eligible <span class="badge">${sameShift.length}</span></div>
+          <div class="summary">${sameShift.map(r => esc(r.agentName || r.systemId)).join(', ')}</div>` : ''}
+        ${diffRegion ? `<div class="summary" style="margin-top:10px;">${diffRegion} agent(s) skipped — different region.</div>` : ''}
+      `;
+    }
+    else {
+      let myGroup = (mine && swapRegionGroup(mine.region) !== 'RAW:OFF') ? swapRegionGroup(mine.region) : swapRegionGroup(mostCommonRegion(agentKey));
+      if(!myGroup) myGroup = swapRegionGroup(mostCommonRegion(agentKey));
+      const dutyRows = dayRows.filter(r => hasShiftTime(r.shift) && swapRegionGroup(r.region) === myGroup);
+
+      resultEl.innerHTML = `
+        <div class="swap-me">
+          <span class="who">${esc(myName)}</span>
+          <span class="meta">${esc(key)} · <b>${mine ? 'OFF' : 'Not scheduled'}</b>${myGroup ? ' · Region: <b>' + esc(myGroup.replace('RAW:','')) + '</b>' : ''}</span>
+        </div>
+        <div class="swap-list-title">Same-region agents on duty <span class="badge">${dutyRows.length}</span></div>
+        <div class="summary" style="margin-bottom:12px;">You are off this day — you could cover any of their shifts (they return the duty on another day).</div>
+        ${dutyRows.length ? dutyRows.map(r => `
+          <div class="swap-item">
+            <span class="avatar ${regionPillClass(r.region)}">${esc(initialsOf(r))}</span>
+            <span class="info">
+              <div class="nm">${esc(r.agentName || r.systemId)}</div>
+              <div class="sid">${r.systemId && r.systemId !== r.agentName ? 'ID: ' + esc(r.systemId) : ''}</div>
+            </span>
+            <span class="pill ${regionPillClass(r.region)}">${esc(r.region)}</span>
+            <span class="why diff">${esc(r.shift)}</span>
+          </div>`).join('')
+        : `<div class="state-msg">No same-region agents on duty that day.</div>`}
+      `;
+    }
+  }
+
+  document.getElementById('swapDate').addEventListener('change', renderSwap);
+  document.getElementById('swapAgent').addEventListener('change', renderSwap);
+
+  /* ========== OT VIEW (Summary + Modal Submit) ========== */
+  function buildOTOptions(){
+    const sel = document.getElementById('otName');
+    if(!sel) return;
+    const keyToNameCounts = {};
+    ALL_ROWS.forEach(r => {
+      if(!r.agentKey) return;
+      keyToNameCounts[r.agentKey] = keyToNameCounts[r.agentKey] || {};
+      keyToNameCounts[r.agentKey][r.agentName] = (keyToNameCounts[r.agentKey][r.agentName] || 0) + 1;
+    });
+    const entries = Object.keys(keyToNameCounts).map(key => {
+      const counts = keyToNameCounts[key];
+      return { key, name: Object.keys(counts).sort((a,b) => counts[b]-counts[a])[0] };
+    }).sort((a,b) => a.name.localeCompare(b.name));
+
+    const current = sel.value;
+    sel.innerHTML = '<option value="">— Select agent —</option>' +
+      entries.map(e => `<option value="${esc(e.key)}">${esc(e.name)}</option>`).join('');
+    if(entries.some(e => e.key === current)) sel.value = current;
+  }
+
+  function setOTDefaultDates(){
+    const r = defaultRangeStrings();
+    document.getElementById('otStartDate').value = r.s;
+    document.getElementById('otEndDate').value = r.e;
+  }
+
+  function renderOTSummary(){
+    const sv = document.getElementById('otStartDate').value;
+    const ev = document.getElementById('otEndDate').value;
+
+    const rows = OT_ROWS.filter(r => {
+      if(sv && r.sortKey < sv) return false;
+      if(ev && r.sortKey > ev) return false;
+      return true;
+    });
+
+    const byAgent = {};
+    rows.forEach(r => {
+      if(!byAgent[r.agentKey]) byAgent[r.agentKey] = { name: r.agentName, hours: 0, entries: 0 };
+      byAgent[r.agentKey].hours += r.hours;
+      byAgent[r.agentKey].entries++;
+    });
+
+    const list = Object.entries(byAgent).sort((a,b) => b[1].hours - a[1].hours);
+
+    const body = document.getElementById('otSummaryBody');
+    const foot = document.getElementById('otSummaryFoot');
+    const msg = document.getElementById('otSummaryMsg');
+    const shell = document.getElementById('otSummaryShell');
+    const badge = document.getElementById('otSummaryBadge');
+    const statRow = document.getElementById('otStatRow');
+
+    const totalHours = list.reduce((s,[,a]) => s + a.hours, 0);
+    const totalAmount = Math.round(totalHours * CONFIG.OT_RATE);
+
+    /* stat chips */
+    statRow.innerHTML = `
+      <div class="stat-chip eu"><span class="n">${fmtHrs(Math.round(totalHours * 10) / 10)}</span><span class="l">Total OT Hours</span></div>
+      <div class="stat-chip glo"><span class="n">${fmtTk(totalAmount)}</span><span class="l">Total OT Payment</span></div>
+      <div class="stat-chip udp"><span class="n">${list.length}</span><span class="l">Agents with OT</span></div>
+    `;
+
+    badge.textContent = `${rows.length} entries`;
+
+    if(!list.length){
+      shell.style.display = 'none';
+      msg.style.display = 'block';
+      return;
+    }
+    shell.style.display = '';
+    msg.style.display = 'none';
+
+    body.innerHTML = list.map(([key, a], i) => `
+      <tr>
+        <td style="color:var(--muted);">${i + 1}</td>
+        <td>
+          <span class="ot-agent-cell">
+            <span class="avatar ${agentRegionClass(key)}">${esc(agentInitials(key))}</span>
+            <span>${esc(a.name)}</span>
+          </span>
+        </td>
+        <td>${a.entries}</td>
+        <td>${fmtHrs(Math.round(a.hours * 10) / 10)} hrs</td>
+        <td style="font-weight:600; color:var(--emerald);">${fmtTk(Math.round(a.hours * CONFIG.OT_RATE))}</td>
+      </tr>`).join('');
+
+    foot.innerHTML = `
+      <tr>
+        <td colspan="2">Total (${list.length} agent${list.length > 1 ? 's' : ''})</td>
+        <td>${rows.length}</td>
+        <td>${fmtHrs(Math.round(totalHours * 10) / 10)} hrs</td>
+        <td style="color:var(--emerald);">${fmtTk(totalAmount)}</td>
+      </tr>`;
+  }
+
+  document.getElementById('otStartDate').addEventListener('change', renderOTSummary);
+  document.getElementById('otEndDate').addEventListener('change', renderOTSummary);
+  document.getElementById('otRangeResetBtn').addEventListener('click', () => {
+    setOTDefaultDates();
+    renderOTSummary();
+  });
+
+  /* ---- OT Submit Modal ---- */
+  function openOTModal(){
+    const dateEl = document.getElementById('otDate');
+    if(!dateEl.value) dateEl.value = getSortKeyFromDate(new Date());
+    const msg = document.getElementById('otModalMsg');
+    msg.style.display = 'none';
+    msg.textContent = '';
+    msg.classList.remove('ok', 'err');
+    document.getElementById('otModalOverlay').style.display = 'flex';
+  }
+  function closeOTModal(){
+    document.getElementById('otModalOverlay').style.display = 'none';
+  }
+
+  document.getElementById('openOTModalBtn').addEventListener('click', openOTModal);
+  document.getElementById('otModalCloseX').addEventListener('click', closeOTModal);
+  document.getElementById('otModalCancel').addEventListener('click', closeOTModal);
+  document.getElementById('otModalOverlay').addEventListener('click', (e) => {
+    if(e.target.id === 'otModalOverlay') closeOTModal();
+  });
+
+  document.getElementById('otSubmitBtn').addEventListener('click', async () => {
+    const dateEl = document.getElementById('otDate');
+    const nameEl = document.getElementById('otName');
+    const hoursEl = document.getElementById('otHours');
+    const msg = document.getElementById('otModalMsg');
+    const btn = document.getElementById('otSubmitBtn');
+
+    const show = (text, isErr) => {
+      msg.style.display = 'block';
+      msg.textContent = text;
+      msg.classList.toggle('ok', !isErr);
+      msg.classList.toggle('err', !!isErr);
+    };
+
+    const date = dateEl.value;
+    const agentKey = nameEl.value;
+    const hours = parseFloat(hoursEl.value);
+
+    if(!date || !agentKey || !isFinite(hours) || hours <= 0){
+      show('❌ Date, Agent Name and Hours — তিনটাই সিলেক্ট করতে হবে।', true);
+      return;
+    }
+
+    const name = agentDisplayName(agentKey);
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    try{
+      await fetch(CONFIG.OT_API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ date: date, name: name, hours: hours })
+      });
+
+      // Optimistic local update — refresh না দিলেও সাথে সাথে দেখা যাবে
+      const d = new Date(date + 'T00:00:00');
+      const dd = String(d.getDate()).padStart(2,'0');
+      OT_ROWS.push({
+        sortKey: date,
+        display: `${dd} ${monthsShortEn[d.getMonth()]} ${d.getFullYear()}`,
+        agentName: name,
+        agentKey: agentKey,
+        hours: hours
+      });
+
+      show(`✅ Saved: ${name} · ${dd} ${monthsShortEn[d.getMonth()]} · ${fmtHrs(hours)} hrs = ৳${Math.round(hours * CONFIG.OT_RATE)}`, false);
+      hoursEl.value = '';
+      renderHistory();
+      renderOTSummary();
+
+      // সফল হলে একটু পরে modal বন্ধ
+      setTimeout(() => {
+        closeOTModal();
+        btn.disabled = false;
+        btn.textContent = 'Save OT';
+      }, 1400);
+      return;
+    }catch(err){
+      show('❌ Submit failed — internet connection check করে আবার try করো।', true);
+    }
+    btn.disabled = false;
+    btn.textContent = 'Save OT';
+  });
+
   /* ========== MAIN LOAD ========== */
   async function loadAll(){
     const stateMsgToday = document.getElementById('stateMsgToday');
     const updatedAtEl = document.getElementById('updatedAt');
-    const prevUpdatedText = updatedAtEl.textContent;
 
     try{
       const newRows = await fetchScheduleRows();
-      ALL_ROWS = newRows; // Only update global state if fetch succeeds
+      ALL_ROWS = newRows;
 
-      // Today View
+      try{ OT_ROWS = await fetchOvertimeRows(); }catch(e){ OT_ROWS = []; }
+
       renderDateNav();
       renderTodayView();
 
-      // Details View
       populateSelect('fMonth', [...new Set(ALL_ROWS.map(r=>r.month))].filter(Boolean));
       populateSelect('fRegion', [...new Set(ALL_ROWS.map(r=>r.region))].filter(Boolean));
       populateSelect('fShift', [...new Set(ALL_ROWS.map(r=>r.shift))].filter(Boolean).sort());
       renderDetails();
 
-      // Agent View
       populateAgents();
       setDefaultDates();
       renderHistory();
+
+      buildSwapOptions();
+      renderSwap();
+      renderCalendar();
+      buildOTOptions();
+      renderOTSummary();
 
       const updated = 'Last updated: ' + new Date().toLocaleString('en-US', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'short'});
       updatedAtEl.textContent = updated;
 
       stateMsgToday.classList.remove('error');
     } catch(err){
-      // If refresh fails, retain old data but show a warning in the header
       if (ALL_ROWS.length === 0) {
         stateMsgToday.classList.add('error');
         stateMsgToday.style.display = 'block';
@@ -2037,7 +2837,6 @@
   }
 
   /* ========== EVENT BINDINGS ========== */
-  // Details Filters
   ['fMonth','fRegion','fShift'].forEach(id => document.getElementById(id).addEventListener('change', () => {
     detailsCurrentPage = 1;
     renderDetails();
@@ -2055,7 +2854,6 @@
     renderDetails();
   });
 
-  // Agent History Filters
   document.getElementById('agentSelect').addEventListener('change', renderHistory);
   document.getElementById('startDate').addEventListener('change', renderHistory);
   document.getElementById('endDate').addEventListener('change', renderHistory);
@@ -2073,11 +2871,10 @@
     renderHistory();
   });
 
-  // Clicking anywhere on a date field opens its calendar picker (not just the icon)
   document.querySelectorAll('input[type="date"]').forEach(input => {
     input.addEventListener('click', () => {
       if(typeof input.showPicker === 'function'){
-        try{ input.showPicker(); }catch(e){ /* ignore if not allowed */ }
+        try{ input.showPicker(); }catch(e){ /* ignore */ }
       }
     });
   });
@@ -2093,6 +2890,7 @@
   });
 
   // Initial Load & Auto Refresh
+  setOTDefaultDates();
   loadAll();
   setInterval(loadAll, CONFIG.REFRESH_MS);
 </script>
